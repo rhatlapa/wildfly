@@ -40,7 +40,7 @@
             <session-type>Stateless</session-type>
         </session>
         
-         <session>
+        <session>
             <ejb-name>simpleBeanWithInjection</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</ejb-class>
             <session-type>Stateless</session-type>
@@ -54,7 +54,7 @@
                 </injection-target>
             </ejb-local-ref>
         </session>
-             <message-driven>  
+        <message-driven>  
             <ejb-name>SimpleMessageBean</ejb-name>  
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleMessageDrivenBean</ejb-class>
             <activation-config>
