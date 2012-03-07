@@ -23,46 +23,48 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class SimpleBeanTestCase {
+
     @Deployment
     public static Archive<?> deployment() {
-        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "ejb-descriptor-configuration-test.jar")
-            .addPackage(SessionTypeSpecifiedBean.class.getPackage())
-            .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml")
-            .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
+        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "ejb-descriptor-configuration-test.jar").addPackage(SessionTypeSpecifiedBean.class.getPackage()).addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
         return jar;
     }
-    
+
     @Test
     public void testSimpleBeanStateless() throws NamingException {
         final InitialContext ctx = new InitialContext();
         try {
-            final SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) 
-                    ctx.lookup("java:global/ejb-descriptor-configuration-test/SimpleBeanDefinition!"
-                    + "org.jboss.as.test.integration.ejb.descriptor.configuration.SessionTypeSpecifiedBean");
-       
+            final SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/simpleBeanDefinitionUnknown");
+
             fail("The SimpleBean should not be available");
         } catch (NameNotFoundException e) {
             // good
         }
     }
-    
+
     @Test
     public void testSimpleBeanSingleton() throws NamingException {
         final InitialContext ctx = new InitialContext();
-        try {
-            SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) 
-                    ctx.lookup("java:global/ejb-descriptor-configuration-test/SimpleBeanDefinition!"
-                    + "org.jboss.as.test.integration.ejb.descriptor.configuration.SessionTypeSpecifiedBean");
-       
-            bean.setName("Singleton");
-//            bean = new SessionTypeSpecifiedBean();
-//            bean.setName("Instance");
-            bean = (SessionTypeSpecifiedBean) ctx.lookup("java:global/ejb-descriptor-configuration-test/SimpleBeanDefinition!"
-                    + "org.jboss.as.test.integration.ejb.descriptor.configuration.SessionTypeSpecifiedBean");
+        SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/simpleBeanDefinition");
 
-            Assert.assertEquals("As singleton the name should remained set","Hi Singleton", bean.greet());
-        } catch (NameNotFoundException e) {
-            
+        bean.setName("Singleton");
+        bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/simpleBeanDefinition");
+
+        Assert.assertEquals("As singleton the name should remained set", "Hi Singleton", bean.greet());
+
+    }
+
+    @Test
+    public void testBeanInjection() throws NamingException {
+        final InitialContext ctx = new InitialContext();
+
+        final SimpleInjectionBeanInterface bean = (SimpleInjectionBeanInterface) ctx.lookup("java:module/simpleBeanWithInjection");
+        try {
+            bean.checkInjection();
+            Assert.assertEquals("Bean wasn't redefined by JBoss specific descriptor to use SimpleSessionBean", 
+                    "Redefined Greetings", bean.greetInjectedBean("InjectionTest"));
+        } catch (RuntimeException e) {
+            fail("Bean is not correctly injected");
         }
     }
 }
