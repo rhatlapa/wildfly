@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ JBoss, Home of Professional Open Source.
   ~ Copyright (c) 2011, Red Hat, Inc., and individual contributors
@@ -20,15 +20,40 @@
   ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
   ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
   -->
-<ejb-jar xmlns="http://java.sun.com/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
-         version="3.1">
+<ejb-jar version="3.1" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd">
     <enterprise-beans>
         <session>
-            <ejb-name>SimpleBeanDefinition</ejb-name>
+            <ejb-name>simpleBeanDefinition</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SessionTypeSpecifiedBean</ejb-class>
-            <session-type>Singleton</session-type>
+            <session-type>Stateful</session-type>
+        </session> 
+        
+        <session>
+            <ejb-name>simpleBeanDefinitionUnkknown</ejb-name>
+            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SessionTypeSpecifiedBean</ejb-class>
+            <session-type>Stateful</session-type>
+        </session>  
+        
+        <session>
+            <ejb-name>simpleSessionBean</ejb-name>
+            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleSessionBean</ejb-class>
+            <session-type>Stateless</session-type>
         </session>
+        
+<!--        <session>
+            <ejb-name>simpleBeanWithInjection</ejb-name>
+            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</ejb-class>
+            <session-type>Stateless</session-type>
+            <ejb-local-ref>
+                <ejb-ref-name>injectedBean</ejb-ref-name>
+                <local>org.jboss.as.test.integration.ejb.descriptor.configuration.SessionBean</local>
+                <ejb-link>simpleSessionBean</ejb-link>
+                <injection-target>
+                    <injection-target-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</injection-target-class>
+                    <injection-target-name>injectedBean</injection-target-name>                    
+                </injection-target>
+            </ejb-local-ref>
+        </session>-->
     </enterprise-beans>
 </ejb-jar>
