@@ -48,7 +48,6 @@
                 <ejb-ref-name>injectedBean</ejb-ref-name>
                 <local>org.jboss.as.test.integration.ejb.descriptor.configuration.SessionBean</local>
                 <ejb-link>simpleSessionBean</ejb-link>
-                <ejb-ref-type>session</ejb-ref-type>
                 <injection-target>
                     <injection-target-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</injection-target-class>
                     <injection-target-name>injectedBean</injection-target-name>                    
