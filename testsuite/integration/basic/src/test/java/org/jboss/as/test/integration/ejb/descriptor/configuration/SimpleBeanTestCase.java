@@ -26,7 +26,11 @@ public class SimpleBeanTestCase {
 
     @Deployment
     public static Archive<?> deployment() {
-        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "ejb-descriptor-configuration-test.jar").addPackage(SessionTypeSpecifiedBean.class.getPackage()).addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
+        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, 
+                "ejb-descriptor-configuration-test.jar")
+                .addPackage(SessionTypeSpecifiedBean.class.getPackage())
+                .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml")
+                .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
         return jar;
     }
 
