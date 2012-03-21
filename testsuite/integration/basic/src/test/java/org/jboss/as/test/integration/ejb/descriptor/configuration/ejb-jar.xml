@@ -58,7 +58,8 @@
                     <injection-target-name>injectedBean</injection-target-name>                    
                 </injection-target>
             </ejb-local-ref>
-        </session>    
+        </session>   
+        
         <message-driven>  
             <ejb-name>SimpleMessageBean</ejb-name>  
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleMessageDrivenBean</ejb-class>
