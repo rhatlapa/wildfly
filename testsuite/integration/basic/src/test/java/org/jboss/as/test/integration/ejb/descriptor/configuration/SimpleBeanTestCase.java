@@ -23,7 +23,6 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class SimpleBeanTestCase {
-
     @Deployment
     public static Archive<?> deployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, 
@@ -34,12 +33,12 @@ public class SimpleBeanTestCase {
         return jar;
     }
 
+
     @Test
     public void testSimpleBeanStateless() throws NamingException {
         final InitialContext ctx = new InitialContext();
         try {
             final SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/simpleBeanDefinitionUnknown");
-
             fail("The SimpleBean should not be available");
         } catch (NameNotFoundException e) {
             // good
@@ -69,6 +68,7 @@ public class SimpleBeanTestCase {
                     "Redefined Greetings", bean.greetInjectedBean("InjectionTest"));
         } catch (RuntimeException e) {
             fail("Bean is not correctly injected");
+
         }
     }
 }
