@@ -71,4 +71,11 @@ public class SimpleBeanTestCase {
 
         }
     }
+    
+    @Test
+    public void testInterceptor() throws NamingException {
+        final InitialContext ctx = new InitialContext();
+        final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/simpleHelloBean");
+        Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor","Hello JbossSpecInterceptedHelloBean", helloBean.hello("HelloBean"));
+    }
 }
