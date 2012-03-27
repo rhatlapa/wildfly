@@ -46,7 +46,14 @@
             <session-type>Stateless</session-type>
         </session>
         
-         <session>
+        <session>
+            <ejb-name>transactionBean</ejb-name>
+            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.TransactionBean</ejb-class>
+            <session-type>Stateless</session-type>
+            <transaction-type>Container</transaction-type>
+        </session>
+        
+        <session>
             <ejb-name>simpleBeanWithInjection</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</ejb-class>
             <session-type>Stateless</session-type>
@@ -87,6 +94,13 @@
     </interceptors>
     
     <assembly-descriptor>
+        <container-transaction>
+            <method>
+                <ejb-name>transactionBean</ejb-name>
+                <method-name>transactionStatus</method-name>
+            </method>
+            <trans-attribute>Never</trans-attribute>
+        </container-transaction>
         <interceptor-binding>
             <ejb-name>simpleHelloBean</ejb-name>
             <interceptor-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInterceptor</interceptor-class>

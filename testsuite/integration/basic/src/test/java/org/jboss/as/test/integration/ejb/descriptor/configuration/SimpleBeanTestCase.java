@@ -4,12 +4,20 @@
  */
 package org.jboss.as.test.integration.ejb.descriptor.configuration;
 
+import javax.ejb.EJBException;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.as.test.integration.ejb.transaction.descriptor.DescriptorBean;
+import org.jboss.as.test.integration.ejb.transaction.descriptor.TransactionLocal;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -23,6 +31,10 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class SimpleBeanTestCase {
+    
+    @ArquillianResource
+    private InitialContext ctx;
+    
     @Deployment
     public static Archive<?> deployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, 
@@ -33,10 +45,8 @@ public class SimpleBeanTestCase {
         return jar;
     }
 
-
     @Test
     public void testSimpleBeanStateless() throws NamingException {
-        final InitialContext ctx = new InitialContext();
         try {
             final SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/simpleBeanDefinitionUnknown");
             fail("The SimpleBean should not be available");
@@ -47,7 +57,6 @@ public class SimpleBeanTestCase {
 
     @Test
     public void testSimpleBeanSingleton() throws NamingException {
-        final InitialContext ctx = new InitialContext();
         SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/simpleBeanDefinition");
 
         bean.setName("Singleton");
@@ -59,8 +68,6 @@ public class SimpleBeanTestCase {
 
     @Test
     public void testBeanInjection() throws NamingException {
-        final InitialContext ctx = new InitialContext();
-
         final SimpleInjectionBeanInterface bean = (SimpleInjectionBeanInterface) ctx.lookup("java:module/simpleBeanWithInjection");
         try {
             bean.checkInjection();
@@ -74,8 +81,25 @@ public class SimpleBeanTestCase {
     
     @Test
     public void testInterceptor() throws NamingException {
-        final InitialContext ctx = new InitialContext();
         final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/simpleHelloBean");
         Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor","Hello JbossSpecInterceptedHelloBean", helloBean.hello("HelloBean"));
     }
+    
+    @Test
+    public void testTransactionStatus() throws SystemException, NotSupportedException, NamingException {
+        final UserTransaction userTransaction = (UserTransaction)new InitialContext().lookup("java:jboss/UserTransaction");
+        final TransactionBean bean = (TransactionBean) ctx.lookup("java:module/transactionBean");
+        Assert.assertEquals(Status.STATUS_NO_TRANSACTION, bean.transactionStatus());
+        try {
+            userTransaction.begin();
+            bean.transactionStatus();
+            throw new RuntimeException("Expected an exception");
+        } catch (EJBException e) {
+            //ignore
+        } finally {
+            userTransaction.rollback();
+        }
+
+    }
+
 }
