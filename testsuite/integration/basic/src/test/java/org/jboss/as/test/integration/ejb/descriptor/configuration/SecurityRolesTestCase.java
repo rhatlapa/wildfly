@@ -43,7 +43,16 @@ public class SecurityRolesTestCase {
     @Deployment
     public static Archive<?> deployment() {
         final WebArchive war = ShrinkWrap.create(WebArchive.class,
-                "ejb-descriptor-configuration-test.war").addPackage(SecurityRolesTestCase.class.getPackage()).addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml").addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "web.xml").addAsResource(SecurityRolesTestCase.class.getPackage(), "jboss-web.xml").addAsManifestResource(new StringAsset("Manifest-Version: 1.0\nDependencies: org.jboss.as.controller-client,org.jboss.dmr\n"), "MANIFEST.MF");
+                "ejb-descriptor-configuration-test.war").addPackage(SecurityRolesTestCase.class.
+                getPackage()).addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
+                addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).
+                addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").
+                addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").
+                addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").
+                addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml").
+                addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "web.xml").
+                addAsResource(SecurityRolesTestCase.class.getPackage(), "jboss-web.xml").
+                addAsManifestResource(new StringAsset("Manifest-Version: 1.0\nDependencies: org.jboss.as.controller-client,org.jboss.dmr\n"), "MANIFEST.MF");
         return war;
     }
 
@@ -97,14 +106,14 @@ public class SecurityRolesTestCase {
         try {
             Assert.assertTrue("User should be in role2", bean.isInRole("role2"));
             Assert.assertFalse("User is expected not being in role1", bean.isInRole("role1"));
-            
+
             try {
                 response = bean.defaultEcho("1");
                 Assert.assertEquals("1", response);
             } catch (EJBAccessException ex) {
                 Assert.fail("Not expected thrown exception for defaultEcho");
             }
-            
+
             try {
                 bean.denyAllEcho("2");
                 Assert.fail("Expected EJBAccessException not thrown");
