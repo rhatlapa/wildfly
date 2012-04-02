@@ -4,10 +4,22 @@
  */
 package org.jboss.as.test.integration.ejb.descriptor.configuration;
 
+import java.security.Principal;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedExceptionAction;
+import java.util.HashSet;
+import java.util.Properties;
+import java.util.Set;
+import javax.annotation.Resource;
+import javax.annotation.security.RunAs;
+import javax.ejb.EJBContext;
 import javax.ejb.EJBException;
+import javax.ejb.SessionContext;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+import javax.security.auth.Subject;
 import javax.transaction.NotSupportedException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
@@ -16,14 +28,15 @@ import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.as.test.integration.ejb.transaction.descriptor.DescriptorBean;
-import org.jboss.as.test.integration.ejb.transaction.descriptor.TransactionLocal;
+import org.jboss.metadata.ejb.spec.MethodMetaData;
+import org.jboss.security.SimplePrincipal;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.fail;
+import org.junit.Ignore;
 
 /**
  *
@@ -31,13 +44,13 @@ import static org.junit.Assert.fail;
  */
 @RunWith(Arquillian.class)
 public class SimpleBeanTestCase {
-    
+
     @ArquillianResource
     private InitialContext ctx;
-    
+
     @Deployment
     public static Archive<?> deployment() {
-        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class, 
+        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
                 "ejb-descriptor-configuration-test.jar")
                 .addPackage(SessionTypeSpecifiedBean.class.getPackage())
                 .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml")
@@ -71,35 +84,33 @@ public class SimpleBeanTestCase {
         final SimpleInjectionBeanInterface bean = (SimpleInjectionBeanInterface) ctx.lookup("java:module/simpleBeanWithInjection");
         try {
             bean.checkInjection();
-            Assert.assertEquals("Bean wasn't redefined by JBoss specific descriptor to use SimpleSessionBean", 
+            Assert.assertEquals("Bean wasn't redefined by JBoss specific descriptor to use SimpleSessionBean",
                     "Redefined Greetings", bean.greetInjectedBean("InjectionTest"));
         } catch (RuntimeException e) {
             fail("Bean is not correctly injected");
 
         }
     }
-    
+
     @Test
     public void testInterceptor() throws NamingException {
         final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/simpleHelloBean");
-        Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor","Hello JbossSpecInterceptedHelloBean", helloBean.hello("HelloBean"));
+        Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor", "Hello JbossSpecInterceptedEjbIntercepted", helloBean.hello(""));
     }
-    
+
     @Test
     public void testTransactionStatus() throws SystemException, NotSupportedException, NamingException {
-        final UserTransaction userTransaction = (UserTransaction)new InitialContext().lookup("java:jboss/UserTransaction");
+        final UserTransaction userTransaction = (UserTransaction) new InitialContext().lookup("java:jboss/UserTransaction");
         final TransactionBean bean = (TransactionBean) ctx.lookup("java:module/transactionBean");
         Assert.assertEquals(Status.STATUS_NO_TRANSACTION, bean.transactionStatus());
         try {
             userTransaction.begin();
             bean.transactionStatus();
             throw new RuntimeException("Expected an exception");
-        } catch (EJBException e) {
-            //ignore
+        } catch (EJBException ex) {
+            // ignore
         } finally {
             userTransaction.rollback();
         }
-
     }
-
 }

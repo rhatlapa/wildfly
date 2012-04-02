@@ -13,5 +13,4 @@ public class SimpleHelloBean {
     public String hello(String name) {
         return "Hello " + name;
     }
-    
 }

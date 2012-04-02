@@ -16,7 +16,7 @@ public class SimpleInterceptor {
             throws Exception {
         Object[] params = ctx.getParameters();
         String name = (String) params[0];
-        params[0] = "Intercepted" + name;
+        params[0] = "EjbIntercepted" + name;
         ctx.setParameters(params);
         Object res = ctx.proceed();
         return res;
