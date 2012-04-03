@@ -28,7 +28,6 @@
                      http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
                version="3.1"
                impl-version="2.0">
-                   
     <enterprise-beans>
         <session>
             <ejb-name>simpleBeanDefinition</ejb-name>
@@ -108,10 +107,10 @@
     </interceptors>
      
     <assembly-descriptor>
-        <s:security>
+<!--        <s:security>
             <ejb-name>RoleProtectedBean</ejb-name>
-            <s:security-domain>ejb3-tests</s:security-domain>
-        </s:security>
+            <s:security-domain>other</s:security-domain>
+        </s:security>-->
         <security-role>
             <role-name>role1</role-name>
         </security-role>
