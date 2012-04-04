@@ -92,7 +92,6 @@ public class SimpleBeanTestCase {
         }
     }
 
-    @Ignore
     @Test
     public void testInterceptor() throws NamingException {
         final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/simpleHelloBean");
