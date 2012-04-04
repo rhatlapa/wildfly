@@ -47,18 +47,6 @@
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleHelloBean</ejb-class>
             <session-type>Stateless</session-type>
         </session>
-              
-        <session>
-            <ejb-name>RoleProtectedBean</ejb-name>
-            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.RoleProtectedBean</ejb-class>
-            <session-type>Stateless</session-type>            
-            <security-role-ref>
-                <role-name>role1</role-name>
-            </security-role-ref>
-            <security-role-ref>
-                <role-name>role2</role-name>
-            </security-role-ref>
-        </session>
         
         <session>
             <ejb-name>transactionBean</ejb-name>
@@ -80,22 +68,7 @@
                     <injection-target-name>injectedBean</injection-target-name>                    
                 </injection-target>
             </ejb-local-ref>
-        </session>   
-        
-        <message-driven>  
-            <ejb-name>SimpleMessageBean</ejb-name>  
-            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleMessageDrivenBean</ejb-class>
-            <activation-config>
-                <activation-config-property>
-                    <activation-config-property-name>destination</activation-config-property-name>
-                    <activation-config-property-value>java:jboss/mdbtest/queue</activation-config-property-value>
-                </activation-config-property>
-                <activation-config-property>
-                    <activation-config-property-name>destinationType</activation-config-property-name>
-                    <activation-config-property-value>javax.jms.Queue</activation-config-property-value>
-                </activation-config-property>
-            </activation-config>
-        </message-driven>
+        </session>           
     </enterprise-beans>
     
     <interceptors>
@@ -107,27 +80,7 @@
         </interceptor>
     </interceptors>
   
-    <assembly-descriptor>
-        <security-role>
-            <role-name>role1</role-name>
-        </security-role>
-        <security-role>
-            <role-name>role2</role-name>
-        </security-role>
-        <method-permission>
-            <role-name>role1</role-name>
-            <method>
-                <ejb-name>RoleProtectedBean</ejb-name>
-                <method-name>role2Echo</method-name>
-            </method>
-        </method-permission>
-        <method-permission>
-            <unchecked/>
-            <method>
-                <ejb-name>RoleProtectedBean</ejb-name>
-                <method-name>denyAllEcho</method-name>
-            </method>
-        </method-permission>
+    <assembly-descriptor>      
         <container-transaction>
             <method>
                 <ejb-name>transactionBean</ejb-name>
@@ -138,12 +91,6 @@
         <interceptor-binding>
             <ejb-name>simpleHelloBean</ejb-name>
             <interceptor-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInterceptor</interceptor-class>
-        </interceptor-binding>  
-        <exclude-list>
-            <method>
-                <ejb-name>RoleProtectedBean</ejb-name>
-                <method-name>permitAllEcho</method-name>
-            </method>
-        </exclude-list>
+        </interceptor-binding>         
     </assembly-descriptor>    
 </ejb-jar>
