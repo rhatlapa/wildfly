@@ -24,6 +24,7 @@ import javax.transaction.NotSupportedException;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
+import javax.validation.constraints.AssertTrue;
 import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -91,7 +92,14 @@ public class SimpleBeanTestCase {
 
         }
     }
+    
+    @Test
+    public void testDescriptorSetEntries() throws NamingException {
+        final ResourceDrivenBean bean = (ResourceDrivenBean) ctx.lookup("java:module/ResourceDrivenBean");
+        Assert.assertEquals("Hello jboss-spec", bean.getTextResource());
+    }
 
+    @Ignore
     @Test
     public void testInterceptor() throws NamingException {
         final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/simpleHelloBean");
