@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jboss.as.test.integration.ejb.descriptor.configuration;
+package org.jboss.as.test.integration.ejb.descriptor.configuration.mdb;
 
 import java.util.Date;
 import javax.annotation.Resource;
@@ -33,7 +33,7 @@ import org.junit.runner.RunWith;
  * @author rhatlapa
  */
 @RunWith(Arquillian.class)
-@ServerSetup({org.jboss.as.test.integration.ejb.descriptor.configuration.MDBTestCase.JmsQueueSetup.class})
+@ServerSetup({org.jboss.as.test.integration.ejb.descriptor.configuration.mdb.MDBTestCase.JmsQueueSetup.class})
 public class MDBTestCase {
     
     private static final Logger logger = Logger.getLogger(MDBTestCase.class);
@@ -68,7 +68,7 @@ public class MDBTestCase {
         ejbJar.addPackage(SimpleMessageDrivenBean.class.getPackage());
         ejbJar.addPackage(JMSOperations.class.getPackage());
         ejbJar.addClass(org.jboss.as.test.integration.ejb.mdb.JMSMessagingUtil.class);
-        ejbJar.addClass(org.jboss.as.test.integration.ejb.descriptor.configuration.MDBTestCase.JmsQueueSetup.class);
+        ejbJar.addClass(org.jboss.as.test.integration.ejb.descriptor.configuration.mdb.MDBTestCase.JmsQueueSetup.class);
         ejbJar.addAsManifestResource(MDBTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
         ejbJar.addAsManifestResource(MDBTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
         ejbJar.addAsManifestResource(new StringAsset("Dependencies: org.jboss.as.controller-client, org.jboss.dmr \n"), "MANIFEST.MF");

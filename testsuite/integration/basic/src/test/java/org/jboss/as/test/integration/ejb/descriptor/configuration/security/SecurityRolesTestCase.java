@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.jboss.as.test.integration.ejb.descriptor.configuration;
+package org.jboss.as.test.integration.ejb.descriptor.configuration.security;
 
 import java.util.logging.Logger;
 import javax.ejb.EJBAccessException;
@@ -12,6 +12,7 @@ import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.test.integration.ejb.security.EjbSecurityDomainSetup;
 import org.jboss.as.test.integration.security.common.AbstractSecurityDomainSetup;
 import org.jboss.as.test.shared.integration.ejb.security.Util;
@@ -72,15 +73,14 @@ public class SecurityRolesTestCase {
         final WebArchive war = ShrinkWrap.create(WebArchive.class,
                 "ejb-descriptor-configuration-test.war").addPackage(SecurityRolesTestCase.class.
                 getPackage()).
-//                addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
+                addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
                 addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).
                 addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").
                 addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").
                 addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").
-                addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml").
+                addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml")//.
 //                addAsWebInfResource(SecurityRolesTestCase.class.getPackage(), "web.xml").
-                addAsResource(SecurityRolesTestCase.class.getPackage(), "jboss-web.xml")
-//                .
+//                addAsResource(SecurityRolesTestCase.class.getPackage(), "jboss-web.xml").
 //                addAsManifestResource(new StringAsset("Manifest-Version: 1.0\nDependencies: org.jboss.as.controller-client,org.jboss.dmr\n"), "MANIFEST.MF")
                 ;
         return war;
