@@ -4,6 +4,7 @@
  */
 package org.jboss.as.test.integration.ejb.descriptor.configuration;
 
+import org.jboss.as.test.integration.ejb.descriptor.configuration.resources.ResourceDrivenBean;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
@@ -15,6 +16,8 @@ import javax.annotation.security.RunAs;
 import javax.ejb.EJBContext;
 import javax.ejb.EJBException;
 import javax.ejb.SessionContext;
+import javax.jms.JMSException;
+import javax.jms.Queue;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
@@ -92,14 +95,7 @@ public class SimpleBeanTestCase {
 
         }
     }
-    
-    @Test
-    public void testDescriptorSetEntries() throws NamingException {
-        final ResourceDrivenBean bean = (ResourceDrivenBean) ctx.lookup("java:module/ResourceDrivenBean");
-        Assert.assertEquals("Hello jboss-spec", bean.getTextResource());
-    }
 
-    @Ignore
     @Test
     public void testInterceptor() throws NamingException {
         final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/simpleHelloBean");
