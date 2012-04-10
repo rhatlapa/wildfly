@@ -11,6 +11,7 @@ import javax.jms.Message;
 import javax.jms.Queue;
 import javax.jms.TextMessage;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
@@ -61,15 +62,26 @@ public class MDBTestCase {
         }
     }
 
-    @Deployment
+    @Deployment(name="ejb3-specVsJboss-spec")
     public static Archive getDeployment() {
-
         final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb.jar");
         ejbJar.addPackage(SimpleMessageDrivenBean.class.getPackage());
         ejbJar.addPackage(JMSOperations.class.getPackage());
         ejbJar.addClass(org.jboss.as.test.integration.ejb.mdb.JMSMessagingUtil.class);
         ejbJar.addClass(org.jboss.as.test.integration.ejb.descriptor.configuration.mdb.MDBTestCase.JmsQueueSetup.class);
         ejbJar.addAsManifestResource(MDBTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
+        ejbJar.addAsManifestResource(MDBTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
+        ejbJar.addAsManifestResource(new StringAsset("Dependencies: org.jboss.as.controller-client, org.jboss.dmr \n"), "MANIFEST.MF");
+        return ejbJar;
+    }
+    
+    @Deployment(name="jboss-spec")
+    public static Archive getDeploymentJbossSpec() {
+        final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb.jar");
+        ejbJar.addPackage(SimpleMessageDrivenBean.class.getPackage());
+        ejbJar.addPackage(JMSOperations.class.getPackage());
+        ejbJar.addClass(org.jboss.as.test.integration.ejb.mdb.JMSMessagingUtil.class);
+        ejbJar.addClass(org.jboss.as.test.integration.ejb.descriptor.configuration.mdb.MDBTestCase.JmsQueueSetup.class);
         ejbJar.addAsManifestResource(MDBTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
         ejbJar.addAsManifestResource(new StringAsset("Dependencies: org.jboss.as.controller-client, org.jboss.dmr \n"), "MANIFEST.MF");
         return ejbJar;
@@ -86,19 +98,25 @@ public class MDBTestCase {
     
     @Resource(mappedName = "java:jboss/mdbtest/replyQueue")
     private Queue replyQueue;
-
-    /**
-     * Test a deployment descriptor based MDB
-     *
-     * @throws Exception
-     */
+    
     @Test
-    public void testMDB() throws Exception {
+    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+    public void testMDBWithJBossSpecRedefinition() throws Exception {
+        testMDB();
+    }
+    
+    @Test
+    @OperateOnDeployment(value="jboss-spec")
+    public void testMDBAsDefinedByJbossSpecDescriptor() throws Exception {
+        testMDB();
+    }
+
+    private void testMDB() throws Exception {
         
         this.util.sendTextMessage("Hello ejb", this.queue, replyQueue);
         this.util.sendTextMessage("Hello jboss-spec", this.redefinedQueue, replyQueue);
         logger.info("Start time of waiting for message in MDB test: " + new Date().getTime());
-        final Message reply = this.util.receiveMessage(replyQueue, 5000);             
+        final Message reply = this.util.receiveMessage(replyQueue, 8000);             
         logger.info("End time of waiting for message in MDB test: " + new Date().getTime());
         Assert.assertNotNull("Reply message was null on reply queue: " + this.replyQueue, reply);
         final String result = ((TextMessage) reply).getText();

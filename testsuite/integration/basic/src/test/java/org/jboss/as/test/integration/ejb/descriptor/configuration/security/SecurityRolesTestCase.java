@@ -7,9 +7,11 @@ package org.jboss.as.test.integration.ejb.descriptor.configuration.security;
 import java.util.logging.Logger;
 import javax.ejb.EJBAccessException;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.security.auth.login.LoginContext;
 import junit.framework.Assert;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.as.arquillian.api.ServerSetup;
@@ -19,6 +21,7 @@ import org.jboss.as.test.shared.integration.ejb.security.Util;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,24 +36,69 @@ public class SecurityRolesTestCase {
     @ArquillianResource
     private InitialContext ctx;
     private static final Logger log = Logger.getLogger(SecurityRolesTestCase.class.getName());
-    
-    @Deployment
+
+    /**
+     * deploys with both EJB specific descriptor and JBoss specific descriptor
+     *
+     * @return
+     */
+    @Deployment(name = "ejb3-specVsJboss-spec")
     public static Archive<?> deployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
                 "ejb-descriptor-configuration-test.jar").
-                addPackage(RoleProtectedBean.class.getPackage()). 
+                addPackage(RoleProtectedBean.class.getPackage()).
                 addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
                 addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).
                 addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").
                 addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").
                 addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").
-                addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml")
-                ;
+                addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
+        return jar;
+    }
+
+    /**
+     * deploys only with JBoss specific descriptor
+     *
+     * @return
+     */
+    @Deployment(name = "jboss-spec")
+    public static Archive<?> deploymentJbossSpec() {
+        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
+                "ejb-descriptor-configuration-test.jar").
+                addPackage(RoleProtectedBean.class.getPackage()).
+                addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
+                addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).
+                addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").
+                addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").
+                addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
         return jar;
     }
 
     @Test
-    public void testSecurityRolesUser1() throws Exception {
+    @OperateOnDeployment(value = "jboss-spec")
+    public void testSecurityRolesUser1JbossSpec() throws Exception {
+        testSecurityRolesUser1();
+    }
+
+    @Test
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
+    public void testSecurityRolesUser1WithJbossSpecRedefinition() throws Exception {
+        testSecurityRolesUser1();
+    }
+
+    @Test
+    @OperateOnDeployment(value = "jboss-spec")
+    public void testSecurityRolesUser2JbossSpec() throws Exception {
+        testSecurityRolesUser2();
+    }
+
+    @Test
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
+    public void testSecurityRolesUser2WithJbossSpecRedefinition() throws Exception {
+        testSecurityRolesUser2();
+    }
+
+    private void testSecurityRolesUser1() throws Exception {
         final RoleProtectedBean bean = (RoleProtectedBean) ctx.lookup("java:global/ejb-descriptor-configuration-test/RoleProtectedBean");
         LoginContext lc = Util.getCLMLoginContext("user1", "password");
         lc.login();
@@ -90,8 +138,7 @@ public class SecurityRolesTestCase {
         }
     }
 
-    @Test
-    public void testSecurityRolesUser2() throws Exception {
+    private void testSecurityRolesUser2() throws Exception {
         final RoleProtectedBean bean = (RoleProtectedBean) ctx.lookup("java:global/ejb-descriptor-configuration-test/RoleProtectedBean");
         LoginContext lc = Util.getCLMLoginContext("user2", "password");
         lc.login();
