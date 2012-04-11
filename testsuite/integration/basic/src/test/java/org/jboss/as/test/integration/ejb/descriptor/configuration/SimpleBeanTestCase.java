@@ -35,86 +35,83 @@ public class SimpleBeanTestCase {
     @ArquillianResource
     private InitialContext ctx;
 
-    @Deployment(name="jboss-spec")
+    @Deployment(name = "jboss-spec")
     public static Archive<?> deploymentJbossSpec() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
-                "ejb-descriptor-configuration-test.jar")
-                .addPackage(SessionTypeSpecifiedBean.class.getPackage())
-                .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
+                "ejb-descriptor-configuration-test-jboss-spec.jar").addPackage(SessionTypeSpecifiedBean.class.
+                getPackage()).addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
         return jar;
     }
-    
-    @Deployment(name="ejb3-specVsJboss-spec")
+
+    @Deployment(name = "ejb3-specVsJboss-spec")
     public static Archive<?> deployment() {
         final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
-                "ejb-descriptor-configuration-test.jar")
-                .addPackage(SessionTypeSpecifiedBean.class.getPackage())
-                .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml")
-                .addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
+                "ejb-descriptor-configuration-test.jar").addPackage(SessionTypeSpecifiedBean.class.
+                getPackage()).addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").
+                addAsManifestResource(SimpleBeanTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
         return jar;
     }
 
     @Test
-    @OperateOnDeployment(value="jboss-spec")
+    @OperateOnDeployment(value = "jboss-spec")
     public void testTransactionStatusJbossSpec() throws NamingException, SystemException, NotSupportedException {
         testTransactionStatus();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="jboss-spec")
+    @OperateOnDeployment(value = "jboss-spec")
     public void testBeanInjectionJbossSpec() throws NamingException, SystemException, NotSupportedException {
         testBeanInjection();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="jboss-spec")
+    @OperateOnDeployment(value = "jboss-spec")
     public void testStatelessBeanJbossSpec() throws NamingException, SystemException, NotSupportedException {
         testSimpleBeanStateless();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="jboss-spec")
+    @OperateOnDeployment(value = "jboss-spec")
     public void testSingletonBeanJbossSpec() throws NamingException, SystemException, NotSupportedException {
         testSimpleBeanSingleton();
     }
-    
-        @Test
-    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+
+    @Test
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
     public void testTransactionStatusWithJbossSpecRedefinition() throws NamingException, SystemException, NotSupportedException {
         testTransactionStatus();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
     public void testBeanInjectionWithJbossSpecRedefinition() throws NamingException, SystemException, NotSupportedException {
         testBeanInjection();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
     public void testStatelessBeanWithJbossSpecRedefinition() throws NamingException, SystemException, NotSupportedException {
         testSimpleBeanStateless();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
     public void testSingletonBeanWithJbossSpecRedefinition() throws NamingException, SystemException, NotSupportedException {
         testSimpleBeanSingleton();
     }
-    
-    @Ignore
+
     @Test
-    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
     public void testInterceptorWithJbossSpecRedefinition() throws NamingException, SystemException, NotSupportedException {
         testInterceptor("Hello JbossSpecInterceptedEjbIntercepted");
     }
-    
+
     @Test
-    @OperateOnDeployment(value="jboss-spec")
+    @OperateOnDeployment(value = "jboss-spec")
     public void testInterceptorJbossSpec() throws NamingException, SystemException, NotSupportedException {
         testInterceptor("Hello JbossSpecIntercepted");
     }
-    
+
     private void testSimpleBeanStateless() throws NamingException {
         try {
             final SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/SimpleBeanDefinitionUnknown");
@@ -144,10 +141,11 @@ public class SimpleBeanTestCase {
 
         }
     }
-    
+
     private void testInterceptor(String expected) throws NamingException {
         final SimpleHelloBean helloBean = (SimpleHelloBean) ctx.lookup("java:module/SimpleHelloBean");
-        Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor", expected, helloBean.hello(""));
+        Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor", expected, helloBean.
+                hello(""));
     }
 
     private void testTransactionStatus() throws SystemException, NotSupportedException, NamingException {

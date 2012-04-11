@@ -53,7 +53,7 @@ public class ResourceRefTestCase {
      */
     @Deployment(name="jboss-spec")
     public static Archive<?> deploymentJbossSpec() {
-        JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "resource-ref-test.jar");
+        JavaArchive jar = ShrinkWrap.create(JavaArchive.class, "resource-ref-test-jboss-spec.jar");
         jar.addClasses(ResourceDrivenBean.class, CreateQueueSetupTask.class, ResourceRefTestCase.class);
         jar.addAsManifestResource(ResourceRefTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
         return jar;

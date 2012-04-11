@@ -77,7 +77,7 @@ public class MDBTestCase {
     
     @Deployment(name="jboss-spec")
     public static Archive getDeploymentJbossSpec() {
-        final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb.jar");
+        final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb-jboss-spec.jar");
         ejbJar.addPackage(SimpleMessageDrivenBean.class.getPackage());
         ejbJar.addPackage(JMSOperations.class.getPackage());
         ejbJar.addClass(org.jboss.as.test.integration.ejb.mdb.JMSMessagingUtil.class);
