@@ -8,9 +8,17 @@ package org.jboss.as.test.integration.ejb.descriptor.configuration;
  *
  * @author rhatlapa
  */
-public class SimpleHelloBean {
-    
-    public String hello(String name) {
+public class SimpleBean {
+    String name = "";
+    public String sayHello() {
         return "Hello " + name;
+    }
+    
+    public void setNameToAnonym() {
+        this.name = "Anonym";
+    }
+    
+    public void setNameToSomebody() {
+        this.name = "Somebody";
     }
 }

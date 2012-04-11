@@ -43,9 +43,12 @@
         </session>
         
         <session>
-            <ejb-name>SimpleHelloBean</ejb-name>
-            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleHelloBean</ejb-class>
-            <session-type>Stateless</session-type>
+            <ejb-name>SimpleBean</ejb-name>
+            <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleBean</ejb-class>
+            <session-type>Stateful</session-type>
+            <after-begin-method>                
+                <method-name>setNameToAnonym</method-name>
+            </after-begin-method>
         </session>
      
         <session>
@@ -70,16 +73,7 @@
             </ejb-local-ref>
         </session>           
     </enterprise-beans>
-    
-    <interceptors>
-        <interceptor>
-            <interceptor-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInterceptor</interceptor-class>
-            <around-invoke>
-                <method-name>helloIntercept</method-name>
-            </around-invoke>
-        </interceptor>
-    </interceptors>
-  
+ 
     <assembly-descriptor>      
         <container-transaction>
             <method>
@@ -87,10 +81,6 @@
                 <method-name>transactionStatus</method-name>
             </method>
             <trans-attribute>Mandatory</trans-attribute>
-        </container-transaction>        
-        <interceptor-binding>
-            <ejb-name>SimpleHelloBean</ejb-name>
-            <interceptor-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInterceptor</interceptor-class>
-        </interceptor-binding>         
+        </container-transaction>                 
     </assembly-descriptor>    
 </ejb-jar>
