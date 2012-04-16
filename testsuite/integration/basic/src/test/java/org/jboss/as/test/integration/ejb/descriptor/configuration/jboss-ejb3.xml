@@ -51,6 +51,7 @@
         </session>
         
         <session>
+            <description>Bean for testing transactions which are driven by Container</description>
             <ejb-name>TransactionBean</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.TransactionBean</ejb-class>
             <session-type>Stateless</session-type>
@@ -58,6 +59,7 @@
         </session>
         
         <session>
+            <description>Bean with injected bean SimpleSessionBeanRedefined</description>
             <ejb-name>SimpleBeanWithInjection</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</ejb-class>
             <session-type>Stateless</session-type>
@@ -75,6 +77,7 @@
      
     <assembly-descriptor>
         <container-transaction>
+            <description>Sets method to never be run in transaction</description>
             <method>
                 <ejb-name>TransactionBean</ejb-name>
                 <method-name>transactionStatus</method-name>

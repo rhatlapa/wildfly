@@ -12,6 +12,14 @@ import javax.interceptor.InvocationContext;
  */
 public class SimpleInterceptor {
 
+    /**
+     * interceptor defined in ejb-spec descriptor ejb-jar.xml which appends at start of the first 
+     * parameter of the intercepted method string distinguishing that this interceptor has been called 
+     * (string used: EjbIntercepted)
+     * @param ctx
+     * @return
+     * @throws Exception 
+     */
     public Object helloIntercept(InvocationContext ctx)
             throws Exception {
         Object[] params = ctx.getParameters();
@@ -22,6 +30,14 @@ public class SimpleInterceptor {
         return res;
     }
     
+    /**
+     * interceptor defined in jboss-spec descriptor jboss-ejb3.xml which appends at start of the first 
+     * parameter of the intercepted method string showing that this interceptor method has been called
+     * (string used: JbossSpecIntercepted)
+     * @param ctx
+     * @return
+     * @throws Exception 
+     */
     public Object redefinedHelloIntercept(InvocationContext ctx)
             throws Exception {
         Object[] params = ctx.getParameters();

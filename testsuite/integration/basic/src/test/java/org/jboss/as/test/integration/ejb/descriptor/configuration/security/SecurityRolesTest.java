@@ -16,69 +16,12 @@ import org.jboss.as.test.shared.integration.ejb.security.Util;
  */
 public class SecurityRolesTest {
 
-//    private static final Logger log = Logger.getLogger(SecurityRolesTestCase.class.getName());
-
     /**
-     * deploys with both EJB specific descriptor and JBoss specific descriptor
+     * tests method permissions for methods in RoleProtectedBean for user1 with role1
      *
-     * @return
+     * @param ctx
+     * @throws Exception
      */
-//    @Deployment(name = "ejb3-specVsJboss-spec")
-//    public static Archive<?> deployment() {
-//        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
-//                "ejb-descriptor-configuration-test.jar").
-//                addPackage(RoleProtectedBean.class.getPackage()).
-//                addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
-//                addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).
-//                addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").
-//                addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").
-//                addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml").
-//                addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "ejb-jar.xml", "ejb-jar.xml");
-//        return jar;
-//    }
-//
-//    /**
-//     * deploys only with JBoss specific descriptor
-//     *
-//     * @return
-//     */
-//    @Deployment(name = "jboss-spec")
-//    public static Archive<?> deploymentJbossSpec() {
-//        final JavaArchive jar = ShrinkWrap.create(JavaArchive.class,
-//                "ejb-descriptor-configuration-test-jboss-spec.jar").
-//                addPackage(RoleProtectedBean.class.getPackage()).
-//                addClasses(AbstractSecurityDomainSetup.class, EjbSecurityDomainSetup.class).
-//                addClass(org.jboss.as.test.shared.integration.ejb.security.Util.class).
-//                addAsResource(SecurityRolesTestCase.class.getPackage(), "users.properties", "users.properties").
-//                addAsResource(SecurityRolesTestCase.class.getPackage(), "roles.properties", "roles.properties").
-//                addAsManifestResource(SecurityRolesTestCase.class.getPackage(), "jboss-ejb3.xml", "jboss-ejb3.xml");
-//        return jar;
-//    }
-//
-//    @Test
-//    @OperateOnDeployment(value = "jboss-spec")
-//    public void testSecurityRolesUser1JbossSpec(@ArquillianResource InitialContext ctx) throws Exception {
-//        testSecurityRolesUser1(new InitialContext());
-//    }
-//
-//    @Test
-//    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
-//    public void testSecurityRolesUser1WithJbossSpecRedefinition(@ArquillianResource InitialContext ctx) throws Exception {
-//        testSecurityRolesUser1(new InitialContext());
-//    }
-//
-//    @Test
-//    @OperateOnDeployment(value = "jboss-spec")
-//    public void testSecurityRolesUser2JbossSpec(@ArquillianResource InitialContext ctx) throws Exception {
-//        testSecurityRolesUser2(new InitialContext());
-//    }
-//
-//    @Test
-//    @OperateOnDeployment(value = "ejb3-specVsJboss-spec")
-//    public void testSecurityRolesUser2WithJbossSpecRedefinition(@ArquillianResource InitialContext ctx) throws Exception {
-//        testSecurityRolesUser2(new InitialContext());
-//    }
-
     protected void testSecurityRolesUser1(InitialContext ctx) throws Exception {
         final RoleProtectedBean bean = (RoleProtectedBean) ctx.lookup("java:module/RoleProtectedBean");
         LoginContext lc = Util.getCLMLoginContext("user1", "password");
@@ -106,19 +49,19 @@ public class SecurityRolesTest {
                 Assert.assertEquals("3", response);
             } catch (EJBAccessException ex) {
                 Assert.fail("PermitAllEcho should be allowed for all security roles");
-            }
-
-            try {
-                bean.role2Echo("4");
-                Assert.fail("Expected EJBAccessException to be thrown");
-            } catch (EJBAccessException ex) {
-            }
+            }            
 
         } finally {
             lc.logout();
         }
     }
 
+    /**
+     * tests method permissions for methods in RoleProtectedBean for user2 with role2
+     *
+     * @param ctx
+     * @throws Exception
+     */
     protected void testSecurityRolesUser2(InitialContext ctx) throws Exception {
         final RoleProtectedBean bean = (RoleProtectedBean) ctx.lookup("java:module/RoleProtectedBean");
         LoginContext lc = Util.getCLMLoginContext("user2", "password");
@@ -154,7 +97,6 @@ public class SecurityRolesTest {
             } catch (EJBAccessException ex) {
                 Assert.fail("role2Echo should be allowed for security role role2");
             }
-
         } finally {
             lc.logout();
         }

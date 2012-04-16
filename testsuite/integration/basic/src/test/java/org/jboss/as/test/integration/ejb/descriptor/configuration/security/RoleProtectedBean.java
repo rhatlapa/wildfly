@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 import javax.ejb.SessionContext;
 
 /**
- *
+ * Bean with access to methods defined by descriptors
  * @author rhatlapa
  */
 

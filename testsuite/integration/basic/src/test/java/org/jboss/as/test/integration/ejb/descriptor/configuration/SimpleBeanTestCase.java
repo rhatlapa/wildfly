@@ -4,7 +4,6 @@
  */
 package org.jboss.as.test.integration.ejb.descriptor.configuration;
 
-import org.jboss.as.test.integration.ejb.descriptor.configuration.interceptors.SimpleHelloBean;
 import javax.ejb.EJBException;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
@@ -24,7 +23,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.fail;
-import org.junit.Ignore;
 
 /**
  *
@@ -35,7 +33,6 @@ public class SimpleBeanTestCase {
 
     @ArquillianResource
     private InitialContext ctx;
-    
     private static final String DEPLOYMENT_JBOSS_SPEC_ONLY = "jboss-spec";
     private static final String DEPLOYMENT_WITH_REDEFINITION = "ejb3-specVsJboss-spec";
 
@@ -100,27 +97,40 @@ public class SimpleBeanTestCase {
 
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
-    public void testSingletonBeanWithJbossSpecRedefinition() throws NamingException{
+    public void testSingletonBeanWithJbossSpecRedefinition() throws NamingException {
         testSimpleBeanSingleton();
     }
-    
+
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
     public void testAfterBeginMethodWithJbossSpecRedefinition() throws NamingException {
-        testAfterBeginMethod();
+        testAfterBeginAndAfterCompletionMethod();
     }
-    
+
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_JBOSS_SPEC_ONLY)
     public void testAfterBeginMethodJbossSpec() throws NamingException {
-        testAfterBeginMethod();
-    }
-    
-    private void testAfterBeginMethod() throws NamingException {
-        final SimpleBean bean = (SimpleBean) ctx.lookup("java:module/SimpleBean");
-        Assert.assertEquals("Hello Somebody", bean.sayHello());
+        testAfterBeginAndAfterCompletionMethod();
     }
 
+    /**
+     * tests correct usage of <after-begin-method> and <before-completion-method> elements
+     *
+     * @throws NamingException
+     */
+    private void testAfterBeginAndAfterCompletionMethod() throws NamingException {
+        final SimpleBean bean = (SimpleBean) ctx.lookup("java:module/SimpleBean");
+
+        bean.setName("NameNotSet");
+        Assert.assertEquals("After method start attribute name hasn't been correctly changed", "Hello Somebody", bean.
+                sayHello());
+
+    }
+
+    /**
+     *
+     * @throws NamingException
+     */
     private void testSimpleBeanStateless() throws NamingException {
         try {
             final SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/SimpleBeanDefinitionUnknown");
@@ -130,6 +140,11 @@ public class SimpleBeanTestCase {
         }
     }
 
+    /**
+     * tests if bean is correctly defined (redefined) as Singleton
+     *
+     * @throws NamingException
+     */
     private void testSimpleBeanSingleton() throws NamingException {
         SessionTypeSpecifiedBean bean = (SessionTypeSpecifiedBean) ctx.lookup("java:module/SimpleBeanDefinition");
 
@@ -139,18 +154,25 @@ public class SimpleBeanTestCase {
         Assert.assertEquals("As singleton the name should remained set", "Hi Singleton", bean.greet());
     }
 
+    /**
+     * tests if correct bean was injected
+     *
+     * @throws NamingException
+     */
     private void testBeanInjection() throws NamingException {
         final SimpleInjectionBeanInterface bean = (SimpleInjectionBeanInterface) ctx.lookup("java:module/SimpleBeanWithInjection");
-        try {
-            bean.checkInjection();
-            Assert.assertEquals("Bean wasn't redefined by JBoss specific descriptor to use SimpleSessionBean",
-                    "Redefined Greetings", bean.greetInjectedBean("InjectionTest"));
-        } catch (RuntimeException e) {
-            fail("Bean is not correctly injected");
-
-        }
+        Assert.assertTrue("Bean wasn't correctly injected", bean.checkInjection());
+        Assert.assertEquals("Bean wasn't redefined by JBoss specific descriptor to use SimpleSessionBean",
+                "Redefined Greetings", bean.greetInjectedBean());
     }
 
+    /**
+     * Tests if transaction is defined or redefined to behave as no transaction supported
+     *
+     * @throws SystemException
+     * @throws NotSupportedException
+     * @throws NamingException
+     */
     private void testTransactionStatus() throws SystemException, NotSupportedException, NamingException {
         final UserTransaction userTransaction = (UserTransaction) ctx.lookup("java:jboss/UserTransaction");
         final TransactionBean bean = (TransactionBean) ctx.lookup("java:module/TransactionBean");
@@ -158,7 +180,7 @@ public class SimpleBeanTestCase {
         try {
             userTransaction.begin();
             bean.transactionStatus();
-            throw new RuntimeException("Expected an exception");
+            throw new RuntimeException("Expected an exception because transactions shouldn't be allowed");
         } catch (EJBException ex) {
             // ignore
         } finally {

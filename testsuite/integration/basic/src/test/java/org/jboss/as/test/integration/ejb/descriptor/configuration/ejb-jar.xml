@@ -43,15 +43,21 @@
         </session>
         
         <session>
+            <description>Simple bean for testing modification of method behavior by calling other method after begining of the method</description>
             <ejb-name>SimpleBean</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleBean</ejb-class>
             <session-type>Stateful</session-type>
             <after-begin-method>                
                 <method-name>setNameToAnonym</method-name>
             </after-begin-method>
+            <after-completion-method>
+                <method-name>setNameToUnknown</method-name>
+            </after-completion-method>
+            <transaction-type>Container</transaction-type>
         </session>
      
         <session>
+            <description>Bean for testing transactions which are driven by Container</description>
             <ejb-name>TransactionBean</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.TransactionBean</ejb-class>
             <session-type>Stateless</session-type>
@@ -59,13 +65,14 @@
         </session>
         
         <session>
+            <description>Bean with injected bean SimpleSessionBean</description>
             <ejb-name>SimpleBeanWithInjection</ejb-name>
             <ejb-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</ejb-class>
             <session-type>Stateless</session-type>
             <ejb-local-ref>
                 <ejb-ref-name>injectedBean</ejb-ref-name>
                 <local>org.jboss.as.test.integration.ejb.descriptor.configuration.SessionBean</local>
-                <ejb-link>simpleSessionBean</ejb-link>
+                <ejb-link>SimpleSessionBean</ejb-link>
                 <injection-target>
                     <injection-target-class>org.jboss.as.test.integration.ejb.descriptor.configuration.SimpleInjectionBean</injection-target-class>
                     <injection-target-name>injectedBean</injection-target-name>                    
@@ -76,11 +83,12 @@
  
     <assembly-descriptor>      
         <container-transaction>
+            <description>Sets that method requires to be run in transaction</description>
             <method>
                 <ejb-name>TransactionBean</ejb-name>
                 <method-name>transactionStatus</method-name>
             </method>
             <trans-attribute>Mandatory</trans-attribute>
-        </container-transaction>                 
+        </container-transaction>
     </assembly-descriptor>    
 </ejb-jar>

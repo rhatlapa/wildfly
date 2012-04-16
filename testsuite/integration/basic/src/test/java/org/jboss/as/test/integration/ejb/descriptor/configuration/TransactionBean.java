@@ -9,7 +9,7 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 /**
- *
+ * Bean used for checking transaction settings
  * @author rhatlapa
  */
 public class TransactionBean {

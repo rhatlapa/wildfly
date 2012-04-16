@@ -1,22 +1,24 @@
 package org.jboss.as.test.integration.ejb.descriptor.configuration;
 
 /**
- * Created by IntelliJ IDEA.
- * User: rhatlapa
- * Date: 3/2/12
- * Time: 12:24 PM
- * To change this template use File | Settings | File Templates.
+ * Bean with injected bean as defined by descriptor
  */
 public class SimpleInjectionBean implements SimpleInjectionBeanInterface {
     private SessionBean injectedBean;
     
-    public void checkInjection() throws RuntimeException {
-        if (injectedBean == null) {
-            throw new NullPointerException("Bean not injected");
-        }
+    /**
+     * checks if bean is injected
+     * @return true if bean is injected, false otherwise
+     */
+    public boolean checkInjection() {
+        return injectedBean != null;
     }
     
-    public String greetInjectedBean(String greetedBy) {
+    /**
+     * calls method greet on injected bean
+     * @return greeting returned by greet() method of injected bean
+     */
+    public String greetInjectedBean() {
         return injectedBean.greet();
     }
 }

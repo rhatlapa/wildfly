@@ -13,6 +13,7 @@ import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -34,6 +35,12 @@ public class InterceptorWithJbossSpecRedefinitionTestCase extends InterceptorTes
         return jar;
     }
 
+    /**
+     * tests interceptor if both descriptors (ejb-jar and jboss-ejb3) are deployed in the module
+     * @param ctx
+     * @throws NamingException 
+     */
+    @Ignore
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
     public void testInterceptorWithJbossSpecRedefinition(@ArquillianResource InitialContext ctx) throws NamingException {

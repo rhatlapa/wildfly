@@ -4,12 +4,18 @@
  */
 package org.jboss.as.test.integration.ejb.descriptor.configuration;
 
+import javax.ejb.SessionContext;
+import javax.naming.InitialContext;
+import javax.transaction.UserTransaction;
+
 /**
- *
+ * Bean for testing descriptor element <after-begin-method> 
  * @author rhatlapa
  */
-public class SimpleBean {
-    String name = "";
+public class SimpleBean {    
+   
+    private String name;
+    
     public String sayHello() {
         return "Hello " + name;
     }
@@ -20,5 +26,17 @@ public class SimpleBean {
     
     public void setNameToSomebody() {
         this.name = "Somebody";
+    }
+    
+    public void setNameToUnknown() {
+        this.name = "Unknown";
+    }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return this.name;
     }
 }

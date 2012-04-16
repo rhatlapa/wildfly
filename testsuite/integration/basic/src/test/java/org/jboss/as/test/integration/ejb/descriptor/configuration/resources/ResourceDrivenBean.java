@@ -9,7 +9,7 @@ import javax.jms.JMSException;
 import javax.jms.Queue;
 
 /**
- *
+ * Simple bean with resources defined by descriptor
  * @author rhatlapa
  */
 public class ResourceDrivenBean {

@@ -36,9 +36,16 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 @ServerSetup({org.jboss.as.test.integration.ejb.descriptor.configuration.mdb.MDBTestCase.JmsQueueSetup.class})
 public class MDBTestCase {
-    
-    private static final Logger logger = Logger.getLogger(MDBTestCase.class);
 
+    private static final Logger logger = Logger.getLogger(MDBTestCase.class);
+    
+    private static final String DEPLOYMENT_JBOSS_SPEC_ONLY = "jboss-spec";
+    private static final String DEPLOYMENT_WITH_REDEFINITION = "ejb3-specVsJboss-spec";
+
+    /**
+     * Inner class which setups and destroys queues used for testing Message driven beans via
+     * descriptors
+     */
     static class JmsQueueSetup implements ServerSetupTask {
 
         private JMSOperations jmsAdminOperations;
@@ -62,7 +69,7 @@ public class MDBTestCase {
         }
     }
 
-    @Deployment(name="ejb3-specVsJboss-spec")
+    @Deployment(name = DEPLOYMENT_WITH_REDEFINITION)
     public static Archive getDeployment() {
         final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb.jar");
         ejbJar.addPackage(SimpleMessageDrivenBean.class.getPackage());
@@ -74,8 +81,8 @@ public class MDBTestCase {
         ejbJar.addAsManifestResource(new StringAsset("Dependencies: org.jboss.as.controller-client, org.jboss.dmr \n"), "MANIFEST.MF");
         return ejbJar;
     }
-    
-    @Deployment(name="jboss-spec")
+
+    @Deployment(name = DEPLOYMENT_JBOSS_SPEC_ONLY)
     public static Archive getDeploymentJbossSpec() {
         final JavaArchive ejbJar = ShrinkWrap.create(JavaArchive.class, "mdb-jboss-spec.jar");
         ejbJar.addPackage(SimpleMessageDrivenBean.class.getPackage());
@@ -86,40 +93,49 @@ public class MDBTestCase {
         ejbJar.addAsManifestResource(new StringAsset("Dependencies: org.jboss.as.controller-client, org.jboss.dmr \n"), "MANIFEST.MF");
         return ejbJar;
     }
-    
     @EJB(mappedName = "java:module/JMSMessagingUtil")
     private JMSMessagingUtil util;
-    
+    // queue which ejb-spec defined MDB listens to     
     @Resource(mappedName = "java:jboss/mdbtest/queue")
     private Queue queue;
-    
+    // queue which jboss-spec defined MDB listens to     
     @Resource(mappedName = "java:jboss/mdbtest/redefinedQueue")
     private Queue redefinedQueue;
-    
+    /**
+     * queue where MDB puts replies
+     */
     @Resource(mappedName = "java:jboss/mdbtest/replyQueue")
     private Queue replyQueue;
-    
+
     @Test
-    @OperateOnDeployment(value="ejb3-specVsJboss-spec")
+    @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
     public void testMDBWithJBossSpecRedefinition() throws Exception {
         testMDB();
     }
-    
+
     @Test
-    @OperateOnDeployment(value="jboss-spec")
+    @OperateOnDeployment(value = DEPLOYMENT_JBOSS_SPEC_ONLY)
     public void testMDBAsDefinedByJbossSpecDescriptor() throws Exception {
         testMDB();
     }
 
+    /**
+     * tests MDB by sending different message to two different queues and checking answer from reply
+     * queue with defined timeout
+     *
+     * descriptor should defined queue which MDB listens to
+     *
+     * @throws Exception
+     */
     private void testMDB() throws Exception {
-        
+
         this.util.sendTextMessage("Hello ejb", this.queue, replyQueue);
         this.util.sendTextMessage("Hello jboss-spec", this.redefinedQueue, replyQueue);
         logger.info("Start time of waiting for message in MDB test: " + new Date().getTime());
-        final Message reply = this.util.receiveMessage(replyQueue, 8000);             
+        final Message reply = this.util.receiveMessage(replyQueue, 8000);
         logger.info("End time of waiting for message in MDB test: " + new Date().getTime());
         Assert.assertNotNull("Reply message was null on reply queue: " + this.replyQueue, reply);
         final String result = ((TextMessage) reply).getText();
-        Assert.assertEquals("MDB should listen on redefinedQueue","replying Hello jboss-spec", result);
+        Assert.assertEquals("MDB should listen on redefinedQueue", "replying Hello jboss-spec", result);
     }
 }

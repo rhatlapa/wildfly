@@ -35,6 +35,11 @@ public class InterceptorJbossSpecTestCase extends InterceptorTests {
         return jar;
     }
 
+    /**
+     * Tests interceptor behavior if only jboss-spec descriptor is deployed with the module
+     * @param ctx
+     * @throws NamingException 
+     */
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_JBOSS_SPEC_ONLY)
     public void testInterceptorJbossSpec(@ArquillianResource InitialContext ctx) throws NamingException {

@@ -14,6 +14,12 @@ import junit.framework.Assert;
  */
 public class InterceptorTests {
 
+    /**
+     * tests interceptor by calling bean with method which has behavior changed by interceptor
+     * @param iniCtx
+     * @param expected is value expected to be returned by intercepted bean
+     * @throws NamingException 
+     */
     protected void testInterceptor(InitialContext iniCtx, String expected) throws NamingException {
         final SimpleHelloBean helloBean = (SimpleHelloBean) iniCtx.lookup("java:module/SimpleHelloBean");
         Assert.assertEquals("Interception method wasn't changed by jboss spec descriptor", expected, helloBean.
