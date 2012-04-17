@@ -114,7 +114,7 @@ public class SimpleBeanTestCase {
     }
 
     /**
-     * tests correct usage of <after-begin-method> and <before-completion-method> elements
+     * tests correct usage of <after-begin-method>
      *
      * @throws NamingException
      */
