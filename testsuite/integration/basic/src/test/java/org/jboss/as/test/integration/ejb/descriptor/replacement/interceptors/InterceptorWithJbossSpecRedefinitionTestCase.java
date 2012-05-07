@@ -40,10 +40,9 @@ public class InterceptorWithJbossSpecRedefinitionTestCase extends InterceptorTes
      * @param ctx
      * @throws NamingException 
      */
-    @Ignore("JBPAPP-8517")
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
     public void testInterceptorWithJbossSpecRedefinition(@ArquillianResource InitialContext ctx) throws NamingException {
-        testInterceptor(ctx, "Hello JbossSpecInterceptedEjbIntercepted");
+        testInterceptor(ctx, "Hello JbossSpecIntercepted");
     }
 }

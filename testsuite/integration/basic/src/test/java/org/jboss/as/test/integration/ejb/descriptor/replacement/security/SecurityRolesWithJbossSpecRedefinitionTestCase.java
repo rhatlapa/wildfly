@@ -53,14 +53,12 @@ public class SecurityRolesWithJbossSpecRedefinitionTestCase extends SecurityRole
         return jar;
     }
 
-    @Ignore("JBPAPP-8624 and AS7-4417")
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
     public void testSecurityRolesUser1WithJbossSpecRedefinition(@ArquillianResource InitialContext ctx) throws Exception {
         testSecurityRolesUser1(ctx);
     }
 
-    @Ignore("JBPAPP-8624 and AS7-4417")
     @Test
     @OperateOnDeployment(value = DEPLOYMENT_WITH_REDEFINITION)
     public void testSecurityRolesUser2WithJbossSpecRedefinition(@ArquillianResource InitialContext ctx) throws Exception {
@@ -86,11 +84,10 @@ public class SecurityRolesWithJbossSpecRedefinitionTestCase extends SecurityRole
 
             try {
                 response = bean.role2Echo("4");
-                Assert.assertEquals("user1 should have permission to access method role2Echo thanks "
-                        + "to merge of permissions from ejb-jar and jboss-spec descriptors", "4", response);
+                Assert.assertEquals("user1 should not have permission to access method role2Echo thanks "
+                        + "to redefinition of permissions in jboss-spec descriptor", "4", response);
             } catch (EJBAccessException ex) {
-                Assert.fail("user1 should have permission to access method role2Echo thanks "
-                        + "to merge of permissions from ejb-jar and jboss-spec descriptors");
+                // ignore
             }
 
         } finally {
