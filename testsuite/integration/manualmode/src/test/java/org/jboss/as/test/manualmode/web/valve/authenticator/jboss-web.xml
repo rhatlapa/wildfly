@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-web>
+    <!--<security-domain>other</security-domain>-->
+    <!--<auth-type>CUSTOM</auth-type>-->
+    <valve>
+        <class-name>org.jboss.as.test.manualmode.web.valve.authenticator.CustomAuthenticator</class-name>
+        <param>
+            <param-name>testparam</param-name>
+            <param-value>webdescriptor</param-value>
+        </param>
+    </valve>
+</jboss-web>
