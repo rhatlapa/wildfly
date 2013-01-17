@@ -23,6 +23,8 @@ package org.jboss.as.test.manualmode.web.valve.authenticator;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.http.Header;
 import org.jboss.arquillian.container.test.api.ContainerController;
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -49,19 +51,19 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 @RunAsClient
-public class AuthenticatorValveTestCase {
+public class DescriptorValveAuthenticatorTestCase {
 
-    private static Logger log = Logger.getLogger(AuthenticatorValveTestCase.class);
+    private static Logger log = Logger.getLogger(DescriptorValveAuthenticatorTestCase.class);
     public static final String CONTAINER = "default-jbossas";
     @ArquillianResource
     private static ContainerController container;
     @ArquillianResource
     private Deployer deployer;
     private static final String modulename = "org.jboss.testvalve";
-    private static final String classname = CustomAuthenticator.class.getName();
+    private static final Class authenticator = TestAuthenticator.class;
     private static final String baseModulePath = "/../modules/" + modulename.replace(".", "/") + "/main";
     private static final String jarName = "testvalve.jar";
-    private static final String CUSTOM_AUTHENTICATOR = "authvalve";
+    private static final String CUSTOM_AUTHENTICATOR = "MYAUTH";
     private static final String PARAM_NAME = "testparam";
     /**
      * the default value is hardcoded in {@link TestValve}
@@ -73,11 +75,11 @@ public class AuthenticatorValveTestCase {
     @Deployment(name = DEPLOYMENT_NAME, managed = false)
     @TargetsContainer(CONTAINER)
     public static WebArchive Hello() {
-        WebArchive war = ShrinkWrap.create(WebArchive.class, "global-valve-test.war");
+        WebArchive war = ShrinkWrap.create(WebArchive.class, "web-descriptor-valve-test.war");
         war.addClasses(HelloServlet.class);
-        war.addAsWebInfResource(AuthenticatorValveTestCase.class.getPackage(), "jboss-web.xml", "jboss-web.xml");
-        war.addAsWebInfResource(AuthenticatorValveTestCase.class.getPackage(),"web-custom-auth.xml", "web-custom-auth.xml");
-        war.addAsManifestResource(AuthenticatorValveTestCase.class.getPackage(), "MANIFEST.MF", "MANIFEST.MF");
+        war.addAsWebInfResource(DescriptorValveAuthenticatorTestCase.class.getPackage(), "jboss-web.xml", "jboss-web.xml");
+        war.addAsWebInfResource(DescriptorValveAuthenticatorTestCase.class.getPackage(), "web-custom-auth.xml", "web.xml");
+        war.addAsManifestResource(DescriptorValveAuthenticatorTestCase.class.getPackage(), "MANIFEST.MF", "MANIFEST.MF");
         return war;
     }
 
@@ -91,11 +93,12 @@ public class AuthenticatorValveTestCase {
     @InSequence(0)
     public void createValveAndDeploy(@ArquillianResource ManagementClient client) throws Exception {
         // as first test in sequence creating valve module
-        ValveUtil.createValveModule(client, modulename, baseModulePath, jarName);
+        ValveUtil.createValveModule(client, modulename, baseModulePath, jarName, TestAuthenticator.class);
+
         // valve is ready - let's deploy
         deployer.deploy(DEPLOYMENT_NAME);
     }
-    
+
     @Test
     @InSequence(1)
     public void testWebDescriptor(@ArquillianResource URL url, @ArquillianResource ManagementClient client) throws Exception {
@@ -108,15 +111,15 @@ public class AuthenticatorValveTestCase {
     @Test
     @InSequence(2)
     public void testValveGlobal(@ArquillianResource URL url, @ArquillianResource ManagementClient client) throws Exception {
-        // as first test in sequence creating valve module
-        ValveUtil.createValveModule(client, modulename, baseModulePath, jarName);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put(PARAM_NAME, GLOBAL_PARAM_VALUE);
         // adding valve based on the created module
-        ValveUtil.addValve(client, CUSTOM_AUTHENTICATOR, modulename, classname, null);
+        ValveUtil.addValve(client, CUSTOM_AUTHENTICATOR, modulename, authenticator.getName(), params);
         ValveUtil.reload(client);
-               
+
         log.debug("Testing url " + url + " against two authenticators - one defined in web descriptor other is defined globally in server configuration");
         Header[] valveHeaders = ValveUtil.hitValve(url);
-        assertEquals("There were two valves defined (but detected these valve headers: "+ Arrays.toString(valveHeaders) +")", 2, valveHeaders.length);
+        assertEquals("There were two valves defined (but detected these valve headers: " + Arrays.toString(valveHeaders) + ")", 2, valveHeaders.length);
         assertEquals(GLOBAL_PARAM_VALUE, valveHeaders[0].getValue());
         assertEquals(WEB_PARAM_VALUE, valveHeaders[1].getValue());
     }
@@ -124,7 +127,7 @@ public class AuthenticatorValveTestCase {
     @Test
     @InSequence(99)
     public void cleanUp(@ArquillianResource ManagementClient client) throws Exception {
-//        deployer.undeploy(DEPLOYMENT_NAME);
+        deployer.undeploy(DEPLOYMENT_NAME);
         ValveUtil.removeValve(client, CUSTOM_AUTHENTICATOR);
         container.stop(CONTAINER);
     }

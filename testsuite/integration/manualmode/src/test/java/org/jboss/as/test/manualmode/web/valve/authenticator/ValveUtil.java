@@ -56,7 +56,8 @@ public class ValveUtil {
 
     private static Logger log = Logger.getLogger(ValveUtil.class);
 
-    public static void createValveModule(final ManagementClient managementClient, String modulename, String baseModulePath, String jarName) throws Exception {
+    public static void createValveModule(final ManagementClient managementClient, String modulename, String baseModulePath, String jarName, Class valveClass) throws Exception {
+        log.info("Creating a valve module " + modulename);
         String path = ValveUtil.readASPath(managementClient.getControllerClient());
         File file = new File(path);
         if (file.exists()) {
@@ -66,7 +67,7 @@ public class ValveUtil {
             if (file.exists()) {
                 file.delete();
             }
-            createJar(file);
+            createJar(file, valveClass);
             file = new File(path + baseModulePath + "/module.xml");
             if (file.exists()) {
                 file.delete();
@@ -93,9 +94,9 @@ public class ValveUtil {
         }
     }
     
-    private static void createJar(File file) {
+    private static void createJar(File file, Class valveClass) {
         JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "temporary-name.jar")
-                              .addClass(CustomAuthenticator.class);       
+                              .addClass(valveClass);       
         log.info(archive.toString(true));
         archive.as(ZipExporter.class).exportTo(file);
     }
