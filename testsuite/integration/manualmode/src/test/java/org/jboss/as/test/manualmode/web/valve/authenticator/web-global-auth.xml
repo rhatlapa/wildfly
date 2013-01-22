@@ -5,14 +5,16 @@
          version="3.0">  
 
     <login-config>
-        <auth-method>MYAUTH</auth-method>
+        <auth-method>MYAUTH_2</auth-method>
         <realm-name>ApplicationRealm</realm-name>
     </login-config>
   
 <!--    <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
--->
+
+     Security testings 
+-->    
     <servlet>
         <servlet-name>HelloServlet</servlet-name>
         <servlet-class>org.jboss.as.test.manualmode.web.valve.authenticator.HelloServlet</servlet-class>
@@ -20,14 +22,13 @@
 
     <servlet-mapping>
         <servlet-name>HelloServlet</servlet-name>
-        <url-pattern>/HelloServlet</url-pattern>
+        <url-pattern>/hello</url-pattern>
     </servlet-mapping>
     
-   <!--Security testings--> 
-   <security-constraint>
+    <security-constraint>
         <web-resource-collection>
             <web-resource-name>Security Tests</web-resource-name>
-            <url-pattern>/HelloServlet</url-pattern>
+            <url-pattern>/hello</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>Users</role-name>

@@ -41,7 +41,7 @@ public class TestAuthenticator extends AuthenticatorBase {
 
     private static Logger log = Logger.getLogger(TestAuthenticator.class);
     
-    private String testparam = "default";
+    private String testparam = AuthValveConstants.DEFAULT_PARAM_VALUE;
 
     public void setTestparam(String testparam) {
         this.testparam = testparam;
@@ -56,6 +56,7 @@ public class TestAuthenticator extends AuthenticatorBase {
 
         Principal principal = request.getUserPrincipal();
         if (principal != null) {
+            log.info("User " + principal.getName() + " is already autenticated");
             return true;
         }
 

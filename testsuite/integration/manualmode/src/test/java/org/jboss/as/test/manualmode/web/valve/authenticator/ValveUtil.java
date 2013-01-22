@@ -225,11 +225,11 @@ public class ValveUtil {
         return null;
     }
     
-    /**
+     /**
      * Access http://localhost/
      * @return "valve" headers
      */
-    public static Header[] hitValve(URL url) throws Exception {
+    public static Header[] hitValve(URL url, int expectedResponseCode) throws Exception {
         HttpGet httpget = new HttpGet(url.toURI());
         DefaultHttpClient httpclient = new DefaultHttpClient();
 
@@ -238,9 +238,14 @@ public class ValveUtil {
 
         int statusCode = response.getStatusLine().getStatusCode();
         Header[] errorHeaders = response.getHeaders("X-Exception");
-        assertEquals("Wrong response code: " + statusCode + " On " + url, HttpURLConnection.HTTP_OK, statusCode);
+        assertEquals("Wrong response code: " + statusCode + " On " + url, expectedResponseCode, statusCode);
         assertEquals("X-Exception(" + Arrays.toString(errorHeaders) + ") is null", 0, errorHeaders.length);
         
         return response.getHeaders("valve");
     }
+    
+     public static Header[] hitValve(URL url) throws Exception {
+         return hitValve(url, HttpURLConnection.HTTP_OK);
+         
+     }
 }
