@@ -41,6 +41,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.ArrayList;
 
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -99,10 +100,12 @@ public class WarResourceListingTestCase {
     @Test()
     public void testDirrectResourceRetrieval() {
         log.info("Test accessing resources using getResource method");
+
         ModuleClassLoader classLoader = (ModuleClassLoader) getClass().getClassLoader();
 
         // checking that resource under META-INF is accessible
         URL manifestResource = classLoader.getResource("META-INF/example.txt");
+
         assertNotNull("Resource in META-INF should be accessible", manifestResource);
 
         // checking that resource under META-INF is accessible
@@ -141,9 +144,7 @@ public class WarResourceListingTestCase {
     }
 
     /**
-     * At the moment it gives all resources including those outside of META_INF, this is the current way it works,
-     * but it should be probably corrected to not list certain resources twice and resources in WEB-INF/classes and WEB-INF/lib
-     * see https://issues.jboss.org/browse/WFLY-1428
+     * Returns all the resources in WAR archive
      *
      * @param recursive -- if even recursive resources (taken from rootDir) shall be provided
      * @param rootDir   -- can be used for getting resources only from specific rootDir
@@ -174,4 +175,5 @@ public class WarResourceListingTestCase {
         Collections.sort(actualResources);
         return actualResources;
     }
+
 }
