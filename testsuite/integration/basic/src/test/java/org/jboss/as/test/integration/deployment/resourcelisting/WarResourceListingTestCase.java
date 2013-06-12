@@ -35,8 +35,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.lang.Class;
+import java.lang.String;
 import java.net.URL;
 import java.util.*;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -65,7 +68,6 @@ public class WarResourceListingTestCase {
         JavaArchive libJar = ShrinkWrap.create(JavaArchive.class, jarLibName);
         libJar.addClass(WebInfLibClass.class);
         war.addAsLibraries(libJar);
-//        war.as(org.jboss.shrinkwrap.api.exporter.ZipExporter.class).exportTo(new java.io.File("/tmp/" + war.getName()), true);
         return war;
     }
 
@@ -94,16 +96,31 @@ public class WarResourceListingTestCase {
         doTestResourceRetrieval(false, "/WEB-INF");
     }
 
-    private void doTestResourceRetrieval(boolean recursive, String rootDir) {
+    @Test()
+    public void testDirrectResourceRetrieval() {
+        log.info("Test accessing resources using getResource method");
         ModuleClassLoader classLoader = (ModuleClassLoader) getClass().getClassLoader();
 
         // checking that resource under META-INF is accessible
         URL manifestResource = classLoader.getResource("META-INF/example.txt");
-        assertNotNull(manifestResource);
+        assertNotNull("Resource in META-INF should be accessible", manifestResource);
+
+        // checking that resource under META-INF is accessible
+        URL mestedManifestResource = classLoader.getResource("META-INF/properties/nested.properties");
+        assertNotNull("Nested resource should be also accessible", mestedManifestResource);
 
         // checking that resource which is not under META-INF is not accessible
         URL nonManifestResource = classLoader.getResource("example2.txt");
-        assertNull(nonManifestResource);
+        assertNull("Resource in the root of WAR shouldn't be accessible", nonManifestResource);
+    }
+
+    /**
+     * Based on provided parameters it filters which resources should be available and which not and tests if the retrieved resources matches this list
+     * @param recursive also a nested/recursive resources are counted
+     * @param rootDir represents the filtering by root directory (only resources in the specified root dir are taken into account
+     */
+    private void doTestResourceRetrieval(boolean recursive, String rootDir) {
+        ModuleClassLoader classLoader = (ModuleClassLoader) getClass().getClassLoader();
 
         List<String> resourcesInDeployment = getActualResourcesInWar(recursive, rootDir);
 
@@ -127,53 +144,34 @@ public class WarResourceListingTestCase {
      * At the moment it gives all resources including those outside of META_INF, this is the current way it works,
      * but it should be probably corrected to not list certain resources twice and resources in WEB-INF/classes and WEB-INF/lib
      * see https://issues.jboss.org/browse/WFLY-1428
+     *
      * @param recursive -- if even recursive resources (taken from rootDir) shall be provided
-     * @param rootDir -- can be used for getting resources only from specific rootDir
+     * @param rootDir   -- can be used for getting resources only from specific rootDir
      * @return list of resources in WAR filtered based on specified arguments
      */
     public static List<String> getActualResourcesInWar(boolean recursive, String rootDir) {
 
-        Class[] libJarClasses = new Class[]{
-                WebInfLibClass.class
-        };
-
-        String[] otherResources = new String[]{
+        String[] resourcesInWar = new String[]{
                 "META-INF/example.txt",
                 "META-INF/MANIFEST.MF",
                 "META-INF/properties/nested.properties",
-                "example2.txt",
                 "TextFile1.txt",
-                "WEB-INF/classes/TextFile1.txt",
-                "WEB-INF/web.xml"
-        };
 
-        Class[] warClasses = new Class[]{
+        };
+        List<String> actualResources = new ArrayList<String>(Arrays.asList(resourcesInWar));
+        Class[] clazzes = new Class[] {
                 WarResourceListingTestCase.class,
                 ResourceListingUtils.class,
+                WebInfLibClass.class
         };
 
-        List<String> resourcesInWar = new ArrayList<String>(Arrays.asList(otherResources));
-        for (Class warClass : warClasses) {
-            String warClassName = ResourceListingUtils.classToPath(warClass);
-            resourcesInWar.add(warClassName);
-            resourcesInWar.add("WEB-INF/classes/" + warClassName);
+        for (Class clazz : clazzes) {
+            actualResources.add(ResourceListingUtils.classToPath(clazz));
         }
 
-        resourcesInWar.addAll(getClassResourcesForInnerLib(libJarClasses, jarLibName));
+        ResourceListingUtils.filterResources(actualResources, rootDir, !recursive);
 
-        ResourceListingUtils.filterResources(resourcesInWar, rootDir, !recursive);
-
-        Collections.sort(resourcesInWar);
-        return resourcesInWar;
+        Collections.sort(actualResources);
+        return actualResources;
     }
-
-    public static Collection<String> getClassResourcesForInnerLib(Class[] classes, String innerArchiveName) {
-        Collection<String> collectionWithResources = new ArrayList<>();
-        for (Class clazz : classes) {
-            collectionWithResources.add("WEB-INF/lib/" + innerArchiveName + "/" + ResourceListingUtils.classToPath(clazz));
-            collectionWithResources.add(ResourceListingUtils.classToPath(clazz));
-        }
-        return collectionWithResources;
-    }
-
 }
