@@ -11,7 +11,13 @@ import java.util.*;
  */
 public class ResourceListingUtils {
 
-
+    /**
+     * Lists resources in deployment using provided API for iterating resources
+     * @param classLoader the deployment class loader
+     * @param rootDir directory which should be considered as root
+     * @param recursive if true also a recursive resources are taken into account, otherwise only resources in rootDir are considered
+     * @return list of resources returned by the API for iterating over deployment resources
+     */
     public static List<String> listResources(ModuleClassLoader classLoader, String rootDir, boolean recursive) {
         List<String> resourceList = new ArrayList<String>();
         Iterator<Resource> it = classLoader.iterateResources(rootDir, recursive);
@@ -22,11 +28,21 @@ public class ResourceListingUtils {
         return resourceList;
     }
 
-
+    /**
+     * translates path to class in package notation to standard path notation with addition of .class suffix
+     * @param clazz class in package notation
+     * @return path representation of class
+     */
     public static String classToPath(Class clazz) {
         return clazz.getName().replaceAll("\\.", "/") + ".class";
     }
 
+    /**
+     * Filters resources in collection using specified parameters
+     * @param resources collection to be filtered
+     * @param rootDir what is the root directory of resources which should be taken into account
+     * @param removeRecursive if recursive resources should be removed or not (true means recursive resources are removed, false means that they are preserved)
+     */
     public static void filterResources(Collection<String> resources, String rootDir, boolean removeRecursive) {
         String rootDirPrefix = "";
         if (rootDir.startsWith("/")) {
