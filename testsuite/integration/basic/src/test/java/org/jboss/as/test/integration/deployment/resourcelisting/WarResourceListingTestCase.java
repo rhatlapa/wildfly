@@ -48,8 +48,7 @@ import static org.junit.Assert.assertNull;
 @RunWith(Arquillian.class)
 public class WarResourceListingTestCase {
 
-    private static Logger log = Logger.getLogger(WarResourceListingTestCase.class);
-    //    private static final String jarLibName = "jarLibrary" + String.valueOf(new Date().getTime()) + ".jar";
+    private static final Logger log = Logger.getLogger(WarResourceListingTestCase.class);
     private static final String jarLibName = "innerJarLibrary.jar";
 
 
@@ -98,7 +97,7 @@ public class WarResourceListingTestCase {
     }
 
     @Test()
-    public void testDirrectResourceRetrieval() {
+    public void testDirectResourceRetrieval() {
         log.info("Test accessing resources using getResource method");
 
         ModuleClassLoader classLoader = (ModuleClassLoader) getClass().getClassLoader();
@@ -109,8 +108,8 @@ public class WarResourceListingTestCase {
         assertNotNull("Resource in META-INF should be accessible", manifestResource);
 
         // checking that resource under META-INF is accessible
-        URL mestedManifestResource = classLoader.getResource("META-INF/properties/nested.properties");
-        assertNotNull("Nested resource should be also accessible", mestedManifestResource);
+        URL nestedManifestResource = classLoader.getResource("META-INF/properties/nested.properties");
+        assertNotNull("Nested resource should be also accessible", nestedManifestResource);
 
         // checking that resource which is not under META-INF is not accessible
         URL nonManifestResource = classLoader.getResource("example2.txt");

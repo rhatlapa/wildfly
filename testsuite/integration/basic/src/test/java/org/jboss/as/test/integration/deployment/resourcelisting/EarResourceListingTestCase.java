@@ -46,7 +46,7 @@ import java.util.List;
 @RunWith(Arquillian.class)
 public class EarResourceListingTestCase {
 
-    private static Logger log = Logger.getLogger(EarResourceListingTestCase.class);
+    private static final Logger log = Logger.getLogger(EarResourceListingTestCase.class);
     private static final String innerWarArchiveName = "innerWarDeployment.jar";
 
     @Deployment

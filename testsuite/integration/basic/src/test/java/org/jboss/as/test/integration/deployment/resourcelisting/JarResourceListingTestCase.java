@@ -42,7 +42,7 @@ import java.util.List;
 @RunWith(Arquillian.class)
 public class JarResourceListingTestCase {
 
-    private static Logger log = Logger.getLogger(JarResourceListingTestCase.class);
+    private static final Logger log = Logger.getLogger(JarResourceListingTestCase.class);
 
     @Deployment
     public static Archive<?> deploy() {
